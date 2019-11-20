@@ -16,5 +16,7 @@ Sphinx = "*"
 twine = "*"
 
 [packages]
-testtask112019 = {path = ".", editable = true}
+testtask112019 = {path = ".",editable = true}
 click = "*"
+sqlalchemy = "*"
+jsonlines = "*"
