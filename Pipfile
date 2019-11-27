@@ -20,3 +20,4 @@ testtask112019 = {path = ".",editable = true}
 click = "*"
 sqlalchemy = "*"
 jsonlines = "*"
+alembic = "*"

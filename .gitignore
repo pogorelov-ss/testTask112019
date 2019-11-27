@@ -107,3 +107,5 @@ ENV/
 
 #vscode
 .vscode/
+# SqlLite
+sqlite.db
