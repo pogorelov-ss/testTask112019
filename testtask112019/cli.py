@@ -34,8 +34,9 @@ def dropdb():
 @click.option('--path', default='/home/xxx/TestTasks/flat-fhir-files/r3', help='path to the folder with data')
 def importdata(path):
     click.echo(f'import data from ndjson {path}')
-    result = import_data(path)
-    click.echo(result)
+    results = import_data(path)
+    for result in results:
+        click.echo(result)
 
 
 main.add_command(initdb)

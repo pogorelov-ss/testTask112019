@@ -83,29 +83,26 @@ def import_data(path):
     else:
         pass
     
-    result = list()
-    result.append(import_patients(path))
+    result = import_patients(path)
     return result
 
 
 def import_patients(path):
     patients_file_path = f'{path}/Patient.ndjson'
     results = list()
-    reader=jsonlines.open(patients_file_path)
-    obj = reader.read()
-    # print(obj['extension'])
-    extensions = obj.get('extension')
-    print(extensions)
-    print('----')
-    for extension in extensions:
-        if 'valueCodeableConcept' in extension.keys():
-            if extension['valueCodeableConcept']['text']=='race':
-                race_code = extension['valueCodeableConcept']['coding'][0]['code']
-                race_code_system = extension['valueCodeableConcept']['coding'][0]['system']
-            if extension['valueCodeableConcept']['text']=='ethnicity':
-                ethnicity_code = extension['valueCodeableConcept']['coding'][0]['code']
-                ethnicity_code_system = extension['valueCodeableConcept']['coding'][0]['system']
-    patient = Patient(
+    with jsonlines.open(patients_file_path) as reader:
+        for obj in reader.iter(type=dict, skip_invalid=True):
+            try:
+                extensions = obj.get('extension')
+                for extension in extensions:
+                    if 'valueCodeableConcept' in extension.keys():
+                        if extension['valueCodeableConcept']['text']=='race':
+                            race_code = extension['valueCodeableConcept']['coding'][0]['code']
+                            race_code_system = extension['valueCodeableConcept']['coding'][0]['system']
+                        if extension['valueCodeableConcept']['text']=='ethnicity':
+                            ethnicity_code = extension['valueCodeableConcept']['coding'][0]['code']
+                            ethnicity_code_system = extension['valueCodeableConcept']['coding'][0]['system']
+                patient = Patient(
                     source_id=obj.get('id'),
                     birth_date=obj.get('birthDate'),
                     gender=obj.get('gender'),
@@ -115,21 +112,9 @@ def import_patients(path):
                     ethnicity_code=ethnicity_code,
                     ethnicity_code_system=ethnicity_code_system
                 )
-    session.add(patient)
+                session.add(patient)
+
+            except Exception as e:
+                results.append(f'{e} error in {obj["id"]}')
     session.commit()
-    reader.close()
-    # with jsonlines.open(patients_file_path) as reader:
-    #     for obj in reader.iter(type=dict, skip_invalid=True):
-    #         try:
-    #             patient = Patient(
-    #                 source_id=obj.get('id'),
-    #                 birth_date=obj.get('birthDate'),
-    #                 gender=obj.get('gender'),
-    #                 country=obj.get('address')[0].get('country'),
-    #                 # race_code=obj.get('extension[].valueCodeableConcept.coding[0].code]
-    #             )
-    #             print(obj.get('address'))
-    #             print('\n')
-    #         except Exception as e:
-    #             results.append(f'{e} error in {obj["id"]}')
     return results
