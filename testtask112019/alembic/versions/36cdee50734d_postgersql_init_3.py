@@ -1,8 +1,8 @@
-"""postgersql init 2
+"""postgersql init 3
 
-Revision ID: ad6f75e63e64
+Revision ID: 36cdee50734d
 Revises: 
-Create Date: 2019-12-02 13:46:09.369573
+Create Date: 2019-12-02 17:54:11.302155
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ad6f75e63e64'
+revision = '36cdee50734d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -32,7 +32,7 @@ def upgrade():
     )
     op.create_table('encouters',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('source_id', sa.Integer(), nullable=True),
+    sa.Column('source_id', sa.String(), nullable=True),
     sa.Column('patient_id', sa.Integer(), nullable=True),
     sa.Column('start_date', sa.DateTime(), nullable=True),
     sa.Column('end_date', sa.DateTime(), nullable=True),
@@ -43,7 +43,7 @@ def upgrade():
     )
     op.create_table('observations',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('source_id', sa.Integer(), nullable=True),
+    sa.Column('source_id', sa.String(), nullable=True),
     sa.Column('patient_id', sa.Integer(), nullable=True),
     sa.Column('encouter_id', sa.Integer(), nullable=True),
     sa.Column('observation_date', sa.Date(), nullable=True),
@@ -57,7 +57,7 @@ def upgrade():
     )
     op.create_table('procedures',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('source_id', sa.Integer(), nullable=True),
+    sa.Column('source_id', sa.String(), nullable=True),
     sa.Column('patient_id', sa.Integer(), nullable=True),
     sa.Column('encouter_id', sa.Integer(), nullable=True),
     sa.Column('procedure_date', sa.Date(), nullable=True),

@@ -6,7 +6,7 @@ import jsonlines
 import os
 
 
-engine = create_engine('postgresql+psycopg2://admin:example@localhost:5432/fhir', echo=True)
+engine = create_engine('postgresql+psycopg2://admin:example@localhost:5432/fhir', echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 
@@ -33,7 +33,7 @@ class Encouter(Base):
     __tablename__ = 'encouters'
 
     id = Column(Integer, primary_key=True)
-    source_id = Column(Integer)
+    source_id = Column(String)
     patient_id = Column(Integer, ForeignKey('patients.id'))
     start_date = Column(DateTime)
     end_date = Column(DateTime)
@@ -48,7 +48,7 @@ class Procedure(Base):
     __tablename__ = 'procedures'
 
     id = Column(Integer, primary_key=True)
-    source_id = Column(Integer)
+    source_id = Column(String)
     patient_id = Column(Integer, ForeignKey('patients.id'))
     encouter_id = Column(Integer, ForeignKey('encouters.id'))
     procedure_date = Column(Date)
@@ -64,7 +64,7 @@ class Observation(Base):
     __tablename__ = 'observations'
 
     id = Column(Integer, primary_key=True)
-    source_id = Column(Integer)
+    source_id = Column(String)
     patient_id = Column(Integer, ForeignKey('patients.id'))
     encouter_id = Column(Integer, ForeignKey('encouters.id'))
     observation_date = Column(Date)
@@ -82,8 +82,9 @@ def import_data(path):
         return 'path not found'
     else:
         pass
-    
+    result = list()
     result = import_patients(path)
+    result.append(import_encouters(path))
     return result
 
 
@@ -115,6 +116,36 @@ def import_patients(path):
                 session.add(patient)
 
             except Exception as e:
-                results.append(f'{e} error in {obj["id"]}')
+                results.append(f'{e} error for patient {obj["id"]}')
+    session.commit()
+    return results
+
+def import_encouters(path):       
+    encouters_file_path = f'{path}/Encounter.ndjson'
+    results = list()
+    last_patient_id=None
+    last_patient_source_id=None
+    with jsonlines.open(encouters_file_path) as reader:
+        for obj in reader.iter(type=dict, skip_invalid=True):
+            try:
+                patient_source_id = obj['subject']['reference'].split('/')[1]
+                if last_patient_source_id==patient_source_id:
+                    patient_id=last_patient_id
+                else:
+                    patient_id = session.query(Patient.id).filter(Patient.source_id==patient_source_id).first()
+                if patient_id is not None:
+                    ecouter = Encouter(
+                        source_id = obj.get('id'),
+                        patient_id = patient_id[0],
+                        start_date = obj['period']['start'],
+                        end_date = obj['period']['end'],
+                        type_code = obj['type'][0]['coding'][0]['code'],
+                        type_code_system = obj['type'][0]['coding'][0]['system']
+                    )
+                    session.add(ecouter)
+                    last_patient_source_id = patient_source_id
+                    last_patient_id = patient_id
+            except Exception as e:
+                results.append(f'{e} error for patient {obj["id"]}')
     session.commit()
     return results
