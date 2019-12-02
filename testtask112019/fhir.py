@@ -4,13 +4,14 @@ from sqlalchemy import Column, Integer, String, Date, ForeignKey, DateTime, Nume
 from sqlalchemy.orm import sessionmaker, relationship
 
 
-engine = create_engine('sqlite:///:sqlite.db', echo=True)
+engine = create_engine('postgresql+psycopg2://admin:example@localhost:5432/fhir', echo=True)
 Session = sessionmaker(bind=engine)
 session = Session()
 
 Base = declarative_base()
 
 # TODO: custom class with Columns: id, type_code, type_code_system?
+
 
 class Patient(Base):
     __tablename__ = 'patients'
@@ -37,6 +38,7 @@ class Encouter(Base):
     type_code = Column(String)
     type_code_system = Column(String)
 
+
 Patient.encouters = relationship('Encouter', order_by=Encouter.id, back_populates="patient")
 
 
@@ -50,6 +52,7 @@ class Procedure(Base):
     procedure_date = Column(Date)
     type_code = Column(String)
     type_code_system = Column(String)
+
 
 Patient.procedures = relationship('Procedure', order_by=Procedure.id, back_populates="patient")
 Encouter.procedures = relationship('Procedure', order_by=Procedure.id, back_populates="encouter")
@@ -65,7 +68,7 @@ class Observation(Base):
     observation_date = Column(Date)
     type_code = Column(String)
     type_code_system = Column(String)
-    value = Column(Numeric) # TODO: extra params?
+    value = Column(Numeric)  # TODO: extra params?
     unit_code = Column(String)
 
 

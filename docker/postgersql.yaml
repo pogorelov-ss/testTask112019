@@ -1,0 +1,24 @@
+# Use postgres/example user/password credentials
+version: '3.1'
+
+services:
+
+  PostgreSQL:
+    image: postgres:latest
+    container_name: PostgreSQL
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: fhir
+    ports:
+     - "5432:5432"
+    # volumes:
+    #   - ./data/postgresql:/var/lib/postgresql/data
+
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8080:8080"

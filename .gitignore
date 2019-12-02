@@ -109,3 +109,4 @@ ENV/
 .vscode/
 # SqlLite
 sqlite.db
+.idea/
