@@ -2,6 +2,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Date, ForeignKey, DateTime, Numeric
 from sqlalchemy.orm import sessionmaker, relationship
+import jsonlines
+import os
 
 
 engine = create_engine('postgresql+psycopg2://admin:example@localhost:5432/fhir', echo=True)
@@ -11,7 +13,7 @@ session = Session()
 Base = declarative_base()
 
 # TODO: custom class with Columns: id, type_code, type_code_system?
-
+# TODO: add back_populates 
 
 class Patient(Base):
     __tablename__ = 'patients'
@@ -39,7 +41,7 @@ class Encouter(Base):
     type_code_system = Column(String)
 
 
-Patient.encouters = relationship('Encouter', order_by=Encouter.id, back_populates="patient")
+# Patient.encouters = relationship('Encouter', order_by=Encouter.id, back_populates="patient")
 
 
 class Procedure(Base):
@@ -54,8 +56,8 @@ class Procedure(Base):
     type_code_system = Column(String)
 
 
-Patient.procedures = relationship('Procedure', order_by=Procedure.id, back_populates="patient")
-Encouter.procedures = relationship('Procedure', order_by=Procedure.id, back_populates="encouter")
+# Patient.procedures = relationship('Procedure', order_by=Procedure.id, back_populates="patient")
+# Encouter.procedures = relationship('Procedure', order_by=Procedure.id, back_populates="encouter")
 
 
 class Observation(Base):
@@ -72,5 +74,62 @@ class Observation(Base):
     unit_code = Column(String)
 
 
-Patient.observations = relationship('Observation', order_by=Observation.id, back_populates="patient")
-Encouter.observations = relationship('Observation', order_by=Observation.id, back_populates="encouter")
+# Patient.observations = relationship('Observation', order_by=Observation.id, back_populates="patient")
+# Encouter.observations = relationship('Observation', order_by=Observation.id, back_populates="encouter")
+
+def import_data(path):
+    if os.path.isdir(path) is False:
+        return 'path not found'
+    else:
+        pass
+    
+    result = list()
+    result.append(import_patients(path))
+    return result
+
+
+def import_patients(path):
+    patients_file_path = f'{path}/Patient.ndjson'
+    results = list()
+    reader=jsonlines.open(patients_file_path)
+    obj = reader.read()
+    # print(obj['extension'])
+    extensions = obj.get('extension')
+    print(extensions)
+    print('----')
+    for extension in extensions:
+        if 'valueCodeableConcept' in extension.keys():
+            if extension['valueCodeableConcept']['text']=='race':
+                race_code = extension['valueCodeableConcept']['coding'][0]['code']
+                race_code_system = extension['valueCodeableConcept']['coding'][0]['system']
+            if extension['valueCodeableConcept']['text']=='ethnicity':
+                ethnicity_code = extension['valueCodeableConcept']['coding'][0]['code']
+                ethnicity_code_system = extension['valueCodeableConcept']['coding'][0]['system']
+    patient = Patient(
+                    source_id=obj.get('id'),
+                    birth_date=obj.get('birthDate'),
+                    gender=obj.get('gender'),
+                    country=obj.get('address')[0].get('country'),
+                    race_code=race_code,
+                    race_code_system=race_code_system,
+                    ethnicity_code=ethnicity_code,
+                    ethnicity_code_system=ethnicity_code_system
+                )
+    session.add(patient)
+    session.commit()
+    reader.close()
+    # with jsonlines.open(patients_file_path) as reader:
+    #     for obj in reader.iter(type=dict, skip_invalid=True):
+    #         try:
+    #             patient = Patient(
+    #                 source_id=obj.get('id'),
+    #                 birth_date=obj.get('birthDate'),
+    #                 gender=obj.get('gender'),
+    #                 country=obj.get('address')[0].get('country'),
+    #                 # race_code=obj.get('extension[].valueCodeableConcept.coding[0].code]
+    #             )
+    #             print(obj.get('address'))
+    #             print('\n')
+    #         except Exception as e:
+    #             results.append(f'{e} error in {obj["id"]}')
+    return results
