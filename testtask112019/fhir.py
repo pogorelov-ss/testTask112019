@@ -13,7 +13,8 @@ session = Session()
 Base = declarative_base()
 
 # TODO: custom class with Columns: id, type_code, type_code_system?
-# TODO: add back_populates 
+# TODO: add back_populates
+
 
 class Patient(Base):
     __tablename__ = 'patients'
@@ -120,7 +121,7 @@ def import_patients(path):
     session.commit()
     return results
 
-def import_encouters(path):       
+def import_encouters(path):
     encouters_file_path = f'{path}/Encounter.ndjson'
     results = list()
     last_patient_id=None
