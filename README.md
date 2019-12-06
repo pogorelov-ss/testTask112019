@@ -12,7 +12,7 @@ python  command line utility ... test task for this year
 
 ## Task description
 
-* [Task 1](https://docs.google.com/document/d/1FwndaKyc3Ua8z0tJTnv34nf3Ass4VigaemGeGNDXkGA/edit?usp=sharing)
+* [Task 1](https://docs.google.com/document/d/1FwndaKyc3Ua8z0tJTnv34nf3Ass4VigaemGeGNDXkGA/edit?usp=sharing) unfinished
 
 ## How to run
 
