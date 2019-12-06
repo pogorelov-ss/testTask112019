@@ -120,7 +120,6 @@ def import_patients(path):
     session.commit()
     return results
 
-
 def import_encouters(path):
     encouters_file_path = f'{path}/Encounter.ndjson'
     results = list()
