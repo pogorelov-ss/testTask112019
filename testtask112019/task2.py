@@ -35,3 +35,16 @@ def sort_matrix_clockwise(size_x, size_y):
 
 # result = sort_matrix_clockwise(2, 8)
 # print(result)
+
+
+def revbits1(n):
+    return int(bin(n)[2:][::-1], 2)
+
+
+def revbits2(n):
+    rev = 0
+    while n:
+        rev <<= 1
+        rev += n & 1
+        n >>= 1
+    return rev

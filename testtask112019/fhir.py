@@ -5,15 +5,15 @@ from sqlalchemy.orm import sessionmaker, relationship
 import jsonlines
 import os
 
-
 engine = create_engine('postgresql+psycopg2://admin:example@localhost:5432/fhir', echo=False)
 Session = sessionmaker(bind=engine)
 session = Session()
 
 Base = declarative_base()
 
+
 # TODO: custom class with Columns: id, type_code, type_code_system?
-# TODO: add back_populates 
+# TODO: add back_populates
 
 class Patient(Base):
     __tablename__ = 'patients'
@@ -97,10 +97,10 @@ def import_patients(path):
                 extensions = obj.get('extension')
                 for extension in extensions:
                     if 'valueCodeableConcept' in extension.keys():
-                        if extension['valueCodeableConcept']['text']=='race':
+                        if extension['valueCodeableConcept']['text'] == 'race':
                             race_code = extension['valueCodeableConcept']['coding'][0]['code']
                             race_code_system = extension['valueCodeableConcept']['coding'][0]['system']
-                        if extension['valueCodeableConcept']['text']=='ethnicity':
+                        if extension['valueCodeableConcept']['text'] == 'ethnicity':
                             ethnicity_code = extension['valueCodeableConcept']['coding'][0]['code']
                             ethnicity_code_system = extension['valueCodeableConcept']['coding'][0]['system']
                 patient = Patient(
@@ -120,27 +120,28 @@ def import_patients(path):
     session.commit()
     return results
 
-def import_encouters(path):       
+
+def import_encouters(path):
     encouters_file_path = f'{path}/Encounter.ndjson'
     results = list()
-    last_patient_id=None
-    last_patient_source_id=None
+    last_patient_id = None
+    last_patient_source_id = None
     with jsonlines.open(encouters_file_path) as reader:
         for obj in reader.iter(type=dict, skip_invalid=True):
             try:
                 patient_source_id = obj['subject']['reference'].split('/')[1]
-                if last_patient_source_id==patient_source_id:
-                    patient_id=last_patient_id
+                if last_patient_source_id == patient_source_id:
+                    patient_id = last_patient_id
                 else:
-                    patient_id = session.query(Patient.id).filter(Patient.source_id==patient_source_id).first()
+                    patient_id = session.query(Patient.id).filter(Patient.source_id == patient_source_id).first()
                 if patient_id is not None:
                     ecouter = Encouter(
-                        source_id = obj.get('id'),
-                        patient_id = patient_id[0],
-                        start_date = obj['period']['start'],
-                        end_date = obj['period']['end'],
-                        type_code = obj['type'][0]['coding'][0]['code'],
-                        type_code_system = obj['type'][0]['coding'][0]['system']
+                        source_id=obj.get('id'),
+                        patient_id=patient_id[0],
+                        start_date=obj['period']['start'],
+                        end_date=obj['period']['end'],
+                        type_code=obj['type'][0]['coding'][0]['code'],
+                        type_code_system=obj['type'][0]['coding'][0]['system']
                     )
                     session.add(ecouter)
                     last_patient_source_id = patient_source_id

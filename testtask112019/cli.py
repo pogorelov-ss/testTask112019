@@ -4,7 +4,7 @@
 import sys
 import click
 from testtask112019.fhir import import_data
-from testtask112019.task2 import sort_matrix_clockwise
+from testtask112019.task2 import sort_matrix_clockwise, revbits2, revbits1
 
 # @click.command()
 # def main(args=None):
@@ -50,7 +50,15 @@ def snail(size_x, size_y):
     click.echo(sort_matrix_clockwise(size_x, size_y))
 
 
+@click.command()
+@click.option('--n', default=13, help='number for revers bit')
+def revbits(n):
+    click.echo(revbits1(n))
+    click.echo(revbits2(n))
+
+
 main.add_command(initdb)
 main.add_command(dropdb)
 main.add_command(importdata)
 main.add_command(snail)
+main.add_command(revbits)

@@ -12,7 +12,7 @@ python  command line utility ... test task for this year
 
 ## Task description
 
-* [Task 1](https://docs.google.com/document/d/1FwndaKyc3Ua8z0tJTnv34nf3Ass4VigaemGeGNDXkGA/edit?usp=sharing)
+* [Task 1](https://docs.google.com/document/d/1FwndaKyc3Ua8z0tJTnv34nf3Ass4VigaemGeGNDXkGA/edit?usp=sharing) unfinished
 
 Task 2
 * `напишите консольную программу которая будет обходить матрицу улиткой начиная с левого верхнего угла. На входе, параметрами 2 числа, размерность матрицы IxJ, на выходе список текущих координат для каждой посещенной точки. Например:  visit.py 3x3  0,0  0,1  0,2  1,2  2,2  2,1  2,0  1,0  1,1`
