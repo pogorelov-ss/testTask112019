@@ -1,3 +1,4 @@
+# sort matrix. snail
 def sort_matrix_clockwise(size_x, size_y):
     result = list()
     input_array = [list(zip(range(size_x), [i] * size_x)) for i in range(size_y)]
@@ -33,10 +34,7 @@ def sort_matrix_clockwise(size_x, size_y):
     return result
 
 
-# result = sort_matrix_clockwise(2, 8)
-# print(result)
-
-
+# reverse bits
 def revbits1(n):
     return int(bin(n)[2:][::-1], 2)
 
